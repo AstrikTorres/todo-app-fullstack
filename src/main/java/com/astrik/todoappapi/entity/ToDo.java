@@ -1,7 +1,5 @@
 package com.astrik.todoappapi.entity;
 
-import org.springframework.beans.factory.annotation.Value;
-
 import javax.persistence.*;
 
 @Entity
@@ -13,13 +11,21 @@ public class ToDo {
     @Column(nullable = false, unique = true)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "text", nullable = false)
     private String text;
 
-    @Column
+    @Column(name = "completed", nullable = false)
     private Boolean completed;
 
-    @Id
+    public ToDo(String text, Boolean completed) {
+        this.text = text;
+        this.completed = completed;
+    }
+
+    public ToDo() {
+
+    }
+
     public Long getId() {
         return id;
     }
