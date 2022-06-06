@@ -4,6 +4,7 @@ import com.astrik.todoappapi.entity.ToDo;
 import com.astrik.todoappapi.repository.ToDoRepository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.Arrays;
@@ -41,5 +42,12 @@ public class ToDoService {
 
     public ToDo saveTodo(ToDo toDo) {
         return toDoRepository.save(toDo);
+    }
+
+    public ToDo updateTodo(ToDo toDo) {
+        return toDoRepository.findById(toDo.getId())
+                .map((item) -> {
+                    return toDoRepository.save(toDo);
+                }).orElseThrow(() -> new RuntimeException("id not found"));
     }
 }

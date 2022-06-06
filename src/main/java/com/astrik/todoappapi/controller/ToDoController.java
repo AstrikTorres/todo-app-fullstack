@@ -33,4 +33,9 @@ public class ToDoController {
         return new ResponseEntity<>(toDoService.saveTodo(toDo), HttpStatus.CREATED);
     }
 
+    @PutMapping
+    public ResponseEntity<ToDo> putTodo(@RequestBody ToDo toDo) {
+        return new ResponseEntity<>(toDoService.updateTodo(toDo), HttpStatus.OK);
+    }
+
 }
