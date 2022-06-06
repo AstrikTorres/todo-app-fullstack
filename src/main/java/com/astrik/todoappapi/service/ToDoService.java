@@ -38,4 +38,8 @@ public class ToDoService {
                 .forEach(toDoRepository::save);
         return toDos;
     }
+
+    public ToDo saveTodo(ToDo toDo) {
+        return toDoRepository.save(toDo);
+    }
 }

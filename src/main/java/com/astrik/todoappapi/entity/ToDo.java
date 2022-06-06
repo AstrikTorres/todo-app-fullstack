@@ -14,7 +14,7 @@ public class ToDo {
     @Column(name = "text", nullable = false)
     private String text;
 
-    @Column(name = "completed", nullable = false)
+    @Column(name = "completed", columnDefinition = "boolean default false")
     private Boolean completed;
 
     public ToDo(String text, Boolean completed) {

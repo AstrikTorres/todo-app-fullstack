@@ -2,10 +2,9 @@ package com.astrik.todoappapi.controller;
 
 import com.astrik.todoappapi.entity.ToDo;
 import com.astrik.todoappapi.service.ToDoService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,16 +20,17 @@ public class ToDoController {
 
     @PostMapping("/default")
     public List<ToDo> createDefaultTodos() {
-        try {
-            return toDoService.setTodosDefault();
-        } catch (Exception e) {
-            return null;
-        }
+        return toDoService.setTodosDefault();
     }
 
     @GetMapping
     public List<ToDo> getAllTodos() {
         return toDoService.reedTodos();
+    }
+
+    @PostMapping
+    public ResponseEntity<ToDo> createTodo(@RequestBody ToDo toDo) {
+        return new ResponseEntity<>(toDoService.saveTodo(toDo), HttpStatus.CREATED);
     }
 
 }
