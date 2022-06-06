@@ -1,7 +1,6 @@
 package com.astrik.todoappapi.entity;
 
 import javax.persistence.*;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -22,6 +21,9 @@ public class ToDo {
     @Column(name = "completed", columnDefinition = "boolean default false")
     @NotNull(message = "The completed property must have a boolean value.", groups = {ToDoCreate.class, ToDoUpdate.class})
     private Boolean completed;
+
+    @ManyToOne
+    private User user;
 
     public ToDo(String text, Boolean completed) {
         this.text = text;
@@ -54,5 +56,13 @@ public class ToDo {
 
     public void setCompleted(boolean completed) {
         this.completed = completed;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
