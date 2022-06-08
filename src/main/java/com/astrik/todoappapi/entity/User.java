@@ -7,6 +7,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -31,12 +32,17 @@ public class User {
     @NotBlank(message = "The password cannot be blank.", groups = UserCreate.class)
     private String password;
 
-    @OneToMany(targetEntity = ToDo.class, mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JsonManagedReference
+    @OneToMany(targetEntity = ToDo.class, mappedBy = "user")
     @JsonIgnore
-    private List<ToDo> todos;
+    private List<ToDo> todos = new ArrayList<>();
 
     public User() {}
+
+    public User(String email, String username, String password) {
+        this.email = email;
+        this.username = username;
+        this.password = password;
+    }
 
     public Long getId() {
         return id;

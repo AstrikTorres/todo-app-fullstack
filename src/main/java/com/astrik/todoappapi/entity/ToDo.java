@@ -1,5 +1,7 @@
 package com.astrik.todoappapi.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -32,6 +34,12 @@ public class ToDo {
 
     public ToDo() {
 
+    }
+
+    public ToDo(String text, boolean completed, User user) {
+        this.text = text;
+        this.completed = completed;
+        this.user = user;
     }
 
     public Long getId() {
