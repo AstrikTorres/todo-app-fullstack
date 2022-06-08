@@ -9,8 +9,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.Min;
 import java.util.List;
 
@@ -55,5 +57,34 @@ public class UserControler {
         return userSevice.removeUser(id)
                 ? ResponseEntity.status(HttpStatus.OK).body(objectNode.put("message", msg[0]))
                 : ResponseEntity.status(HttpStatus.NOT_FOUND).body(objectNode.put("message", msg[1]));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    ResponseEntity<ObjectNode> handleConstraintViolationException(ConstraintViolationException e) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode objectNode = objectMapper.createObjectNode();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(objectNode.put("message", e.getMessage()));
+    }
+
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ObjectNode handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex
+    ) {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode errors = mapper.createObjectNode();
+
+        ex.getBindingResult()
+                .getFieldErrors()
+                .forEach(
+                        error ->
+                                errors.put(
+                                        error.getField(),
+                                        error.getDefaultMessage()
+                                ));
+
+        return errors;
     }
 }
