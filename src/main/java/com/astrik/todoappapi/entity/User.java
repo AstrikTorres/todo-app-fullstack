@@ -19,7 +19,7 @@ public class User {
     @NotNull(message = "the id is needed to update", groups = UserUpdate.class)
     private Long id;
 
-    @Column(name = "username", nullable = false, length = 50)
+    @Column(name = "username", nullable = false, unique = true, length = 50)
     @NotBlank(message = "The username cannot be blank.", groups = UserCreate.class)
     private String username;
 

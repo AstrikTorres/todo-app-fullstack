@@ -19,17 +19,22 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 @Validated
-public class UserControler {
+public class UserController {
 
     private UserService userService;
 
-    public UserControler(UserService userService) {
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
         return new ResponseEntity<>(userService.reedUsers(), HttpStatus.OK);
+    }
+
+    @GetMapping("/auth")
+    public ResponseEntity<User> getAuthUser() {
+        return new ResponseEntity<>(userService.getAuthUser(), HttpStatus.OK);
     }
 
     @PostMapping
