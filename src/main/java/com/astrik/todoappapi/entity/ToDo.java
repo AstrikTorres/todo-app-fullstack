@@ -1,5 +1,7 @@
 package com.astrik.todoappapi.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -23,6 +25,7 @@ public class ToDo {
     private Boolean completed;
 
     @ManyToOne
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private User user;
 
     public ToDo(String text, Boolean completed) {
@@ -32,6 +35,12 @@ public class ToDo {
 
     public ToDo() {
 
+    }
+
+    public ToDo(String text, Boolean completed, User user) {
+        this.text = text;
+        this.completed = completed;
+        this.user = user;
     }
 
     public Long getId() {
