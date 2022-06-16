@@ -1,8 +1,8 @@
 package com.astrik.todoappapi.controller;
 
 import com.astrik.todoappapi.entity.User;
-import com.astrik.todoappapi.entity.UserCreate;
-import com.astrik.todoappapi.entity.UserUpdate;
+import com.astrik.todoappapi.entity.UserValid;
+import com.astrik.todoappapi.service.UserDetailsServiceImpl;
 import com.astrik.todoappapi.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -13,8 +13,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.ConstraintViolationException;
-import javax.validation.constraints.Min;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -22,9 +22,11 @@ import java.util.List;
 public class UserController {
 
     private UserService userService;
+    private ObjectMapper objectMapper;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, ObjectMapper objectMapper) {
         this.userService = userService;
+        this.objectMapper = objectMapper;
     }
 
     @GetMapping
@@ -34,40 +36,44 @@ public class UserController {
 
     @GetMapping("/auth")
     public ResponseEntity<User> getAuthUser() {
-        return new ResponseEntity<>(userService.getAuthUser(), HttpStatus.OK);
+        return new ResponseEntity<>(UserDetailsServiceImpl.getAuthUser(), HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<User> createUser(
-            @RequestBody @Validated(UserCreate.class) User user) {
-        return new ResponseEntity<>(userService.saveUser(user), HttpStatus.CREATED);
+            @RequestBody @Validated(UserValid.class) User user) {
+        User userCreated = userService.saveUser(user);
+        return userCreated.getUsername() != user.getUsername()
+                ? new ResponseEntity<>(userCreated, HttpStatus.BAD_REQUEST)
+                : new ResponseEntity<>(userCreated, HttpStatus.CREATED);
     }
 
     @PutMapping
-    public ResponseEntity<User> putUser(
-            @RequestBody @Validated(UserUpdate.class) User user) {
-        return new ResponseEntity<>(userService.updateUser(user), HttpStatus.OK);
+    public ResponseEntity<Object> putUser(
+            @RequestBody @Validated(UserValid.class) User user) {
+        User userUpdated = userService.updateUser(user);
+        return userUpdated.getUsername() != user.getUsername()
+                ? new ResponseEntity<>(userUpdated, HttpStatus.BAD_REQUEST)
+                : new ResponseEntity<>(userUpdated, HttpStatus.OK);
     }
 
-    @DeleteMapping(path = "/{id}")
-    ResponseEntity<ObjectNode> deleteUser(@PathVariable @Min(1) Long id) {
+    @DeleteMapping
+    ResponseEntity<ObjectNode> deleteUser() {
         String[] msg = {
                 "Deleted User",
                 "Try again - verify param"
         };
 
-        ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode objectNode = objectMapper.createObjectNode();
 
-        return userService.removeUser(id)
+        return userService.removeUser()
                 ? ResponseEntity.status(HttpStatus.OK).body(objectNode.put("message", msg[0]))
-                : ResponseEntity.status(HttpStatus.NOT_FOUND).body(objectNode.put("message", msg[1]));
+                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(objectNode.put("message", msg[1]));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     ResponseEntity<ObjectNode> handleConstraintViolationException(ConstraintViolationException e) {
-        ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode objectNode = objectMapper.createObjectNode();
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(objectNode.put("message", e.getMessage()));
@@ -78,8 +84,7 @@ public class UserController {
     public ObjectNode handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex
     ) {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode errors = mapper.createObjectNode();
+        ObjectNode errors = objectMapper.createObjectNode();
 
         ex.getBindingResult()
                 .getFieldErrors()

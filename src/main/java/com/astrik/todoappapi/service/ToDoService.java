@@ -18,12 +18,12 @@ public class ToDoService {
         this.toDoRepository = toDoRepository;
     }
 
-    public List<ToDo> reedTodosByUser(Long userId) {
-        return toDoRepository.findByUserId(userId);
+    public List<ToDo> reedTodosByUser() {
+        return toDoRepository.findByUserId(UserDetailsServiceImpl.getAuthUser().getId());
     }
 
-    public List<ToDo> setTodosDefault(Long userId) {
-        User user = new User(userId);
+    public List<ToDo> setTodosDefault() {
+        User user = UserDetailsServiceImpl.getAuthUser();
         ToDo toDo1 = new ToDo("Cortar cebolla", false, user);
         ToDo toDo2 = new ToDo("Llorar con la llorona", true, user);
         ToDo toDo3 = new ToDo("Hacer el curso de Spring Boot", true, user);
@@ -35,60 +35,71 @@ public class ToDoService {
         return toDos;
     }
 
-    public ToDo saveTodo(ToDo toDo, Long userId) {
-        toDo.setUser(new User(userId));
+    public List<ToDo> setTodosDefault(User user) {
+        ToDo toDo1 = new ToDo("Cortar cebolla", false, user);
+        ToDo toDo2 = new ToDo("Llorar con la llorona", true, user);
+        ToDo toDo3 = new ToDo("Hacer el curso de Spring Boot", true, user);
+        ToDo toDo4 = new ToDo("Hacer el curso de React", true, user);
+
+        List<ToDo> toDos = Arrays.asList(toDo1, toDo2, toDo3, toDo4);
+
+        toDoRepository.saveAll(toDos);
+        return toDos;
+    }
+
+    public ToDo saveTodo(ToDo toDo) {
+        toDo.setUser(UserDetailsServiceImpl.getAuthUser());
         return toDoRepository.save(toDo);
     }
 
-    public List<ToDo> saveTodoList(List<ToDo> toDos, Long userId) {
+    public List<ToDo> saveTodoList(List<ToDo> toDos) {
+        User user = UserDetailsServiceImpl.getAuthUser();
         List<ToDo> toDosSaved = new ArrayList<>();
         toDos.forEach(toDo -> {
-            toDo.setUser(new User(userId));
+            toDo.setUser(user);
             toDoRepository.save(toDo);
             toDosSaved.add(toDo);
         });
         return toDosSaved;
     }
 
-    public ToDo updateTodo(ToDo toDo, Long userId) {
-        return toDoRepository.findById(toDo.getId())
+    public ToDo updateTodo(ToDo toDo) {
+        User user = UserDetailsServiceImpl.getAuthUser();
+        return toDoRepository.findByIdAndUserId(toDo.getId(), user.getId())
                 .map((item) -> {
-                    if (item.getUser().getId().equals(userId)) {
-                        toDo.setUser(new User(userId));
-                        return toDoRepository.save(toDo);
-                    }
-                    else return null;
+                    toDo.setUser(user);
+                    return toDoRepository.save(toDo);
                 }).orElseThrow(() -> new RuntimeException("id not found"));
     }
 
-    public List<ToDo> updateTodoList(List<ToDo> toDos, Long userId) throws RuntimeException {
+    public List<ToDo> updateTodoList(List<ToDo> toDos) throws RuntimeException {
+        User user = UserDetailsServiceImpl.getAuthUser();
         List<ToDo> toDosUpdated = new ArrayList<>();
-        toDos.forEach(toDo -> toDoRepository.findById(toDo.getId())
+        toDos.forEach(toDo -> toDoRepository.findByIdAndUserId(toDo.getId(), user.getId())
                 .map((item) -> {
-                    if (item.getUser().getId().equals(userId)) {
-                        toDo.setUser(new User(userId));
-                        return toDosUpdated.add(toDoRepository.save(toDo));
-                    } else return null;
+                    toDo.setUser(user);
+                    return toDosUpdated.add(toDoRepository.save(toDo));
                 }).orElseThrow(() -> new RuntimeException("todo id not found: " + toDo.getId()))
         );
         return toDosUpdated;
     }
 
-    public boolean removeTodo(Long id, Long userId) {
-        if (!toDoRepository.existsByIdAndUserId(id, userId)) return false;
+    public boolean removeTodo(Long id) {
+        User user = UserDetailsServiceImpl.getAuthUser();
+        if (!toDoRepository.existsByIdAndUserId(id, user.getId())) return false;
         try {
-            toDoRepository.deleteByIdAndUserId(id, userId);
-            return !toDoRepository.existsByIdAndUserId(id, userId);
+            toDoRepository.deleteByIdAndUserId(id, user.getId());
+            return !toDoRepository.existsByIdAndUserId(id, user.getId());
         } catch (Exception e) {
             return false;
         }
     }
 
-    public boolean removeTodoList(List<ToDo> toDos, Long userId) {
-        toDos.forEach(toDo -> toDoRepository.findByIdAndUserId(toDo.getId(), userId)
+    public boolean removeTodoList(List<ToDo> toDos) {
+        User user = UserDetailsServiceImpl.getAuthUser();
+        toDos.forEach(toDo -> toDoRepository.findByIdAndUserId(toDo.getId(), user.getId())
                 .map((t) -> {
-                    if (t.getUser().getId().equals(userId))
-                        toDoRepository.deleteByIdAndUserId(toDo.getId(), userId);
+                    toDoRepository.deleteByIdAndUserId(toDo.getId(), user.getId());
                     return true;
                 }).orElseThrow(() -> new RuntimeException("id not found " + toDo.getId()))
         );

@@ -15,15 +15,15 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true, updatable = false)
-    @NotNull(message = "the id is needed to update", groups = UserUpdate.class)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Long id;
 
     @Column(name = "username", nullable = false, unique = true, length = 50)
-    @NotBlank(message = "The username cannot be blank.", groups = UserCreate.class)
+    @NotBlank(message = "The username cannot be blank.", groups = UserValid.class)
     private String username;
 
     @Column(name = "password", nullable = false)
-    @NotBlank(message = "The password cannot be blank.", groups = UserCreate.class)
+    @NotBlank(message = "The password cannot be blank.", groups = UserValid.class)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
@@ -35,6 +35,10 @@ public class User {
 
     public User(Long id) {
         this.id = id;
+    }
+
+    public User(String username) {
+        this.username = username;
     }
 
     public Long getId() {

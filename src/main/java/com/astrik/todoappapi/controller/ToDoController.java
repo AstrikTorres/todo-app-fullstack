@@ -26,48 +26,41 @@ public class ToDoController {
     }
 
     @PostMapping("/default")
-    public ResponseEntity<List<ToDo>> createDefaultTodos(
-            @RequestParam @Min(value = 0, message = "invalid parameter") Long user) {
-        return new ResponseEntity<>(toDoService.setTodosDefault(user), HttpStatus.OK);
+    public ResponseEntity<List<ToDo>> createDefaultTodos() {
+        return new ResponseEntity<>(toDoService.setTodosDefault(), HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<List<ToDo>> getAllTodosByUserId(
-            @RequestParam @Min(value = 0, message = "invalid parameter") Long user) {
-        return new ResponseEntity<>(toDoService.reedTodosByUser(user), HttpStatus.OK);
+    public ResponseEntity<List<ToDo>> getAllTodosByUserId() {
+        return new ResponseEntity<>(toDoService.reedTodosByUser(), HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<ToDo> createTodo(
-            @RequestBody @Validated(ToDoCreate.class) ToDo toDo,
-            @RequestParam @Min(value = 1, message = "invalid parameter") Long user) {
-        return new ResponseEntity<>(toDoService.saveTodo(toDo, user), HttpStatus.CREATED);
+            @RequestBody @Validated(ToDoCreate.class) ToDo toDo) {
+        return new ResponseEntity<>(toDoService.saveTodo(toDo), HttpStatus.CREATED);
     }
 
     @PostMapping("/list")
     public ResponseEntity<List<ToDo>> createTodoList(
-            @RequestBody List<ToDo> todosList,
-            @RequestParam @Min(value = 1, message = "invalid parameter") Long user) {
-        return new ResponseEntity<>(toDoService.saveTodoList(todosList, user), HttpStatus.CREATED);
+            @RequestBody List<ToDo> todosList) {
+        return new ResponseEntity<>(toDoService.saveTodoList(todosList), HttpStatus.CREATED);
     }
 
     @PutMapping
     public ResponseEntity<ToDo> putTodo(
-            @RequestBody @Validated(ToDoUpdate.class) ToDo toDo,
-            @RequestParam @Min(value = 1, message = "invalid parameter") Long user) {
-        return new ResponseEntity<>(toDoService.updateTodo(toDo, user), HttpStatus.OK);
+            @RequestBody @Validated(ToDoUpdate.class) ToDo toDo) {
+        return new ResponseEntity<>(toDoService.updateTodo(toDo), HttpStatus.OK);
     }
 
     @PutMapping("/list")
     public ResponseEntity<List<ToDo>> putTodoList(
-            @RequestBody List<ToDo> toDoList,
-            @RequestParam @Min(value = 1, message = "invalid parameter") Long user) {
-        return new ResponseEntity<>(toDoService.updateTodoList(toDoList, user), HttpStatus.OK);
+            @RequestBody List<ToDo> toDoList) {
+        return new ResponseEntity<>(toDoService.updateTodoList(toDoList), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<ObjectNode> deleteTodo(@PathVariable @Min(1) Long id,
-                                          @RequestParam Long user) {
+    ResponseEntity<ObjectNode> deleteTodo(@PathVariable @Min(1) Long id) {
         String[] msg = {
                 "Deleted to do",
                 "Try again - verify param"
@@ -76,14 +69,13 @@ public class ToDoController {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode objectNode = objectMapper.createObjectNode();
 
-        return toDoService.removeTodo(id, user)
+        return toDoService.removeTodo(id)
                 ? ResponseEntity.status(HttpStatus.OK).body(objectNode.put("message", msg[0]))
                 : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(objectNode.put("message", msg[1]));
     }
 
     @DeleteMapping(path = "/list")
-    ResponseEntity<ObjectNode> deleteTodoList(@RequestBody List<ToDo> toDoList,
-                                              @RequestParam @Min(value = 1, message = "invalid parameter") Long user) {
+    ResponseEntity<ObjectNode> deleteTodoList(@RequestBody List<ToDo> toDoList) {
         String[] msg = {
                 "Deleted to do's",
                 "Try again - verify param"
@@ -92,7 +84,7 @@ public class ToDoController {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode objectNode = objectMapper.createObjectNode();
 
-        return toDoService.removeTodoList(toDoList, user)
+        return toDoService.removeTodoList(toDoList)
                 ? ResponseEntity.status(HttpStatus.OK).body(objectNode.put("message", msg[0]))
                 : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(objectNode.put("message", msg[1]));
     }

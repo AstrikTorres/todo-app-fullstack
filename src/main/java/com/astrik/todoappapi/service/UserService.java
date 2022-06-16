@@ -2,12 +2,12 @@ package com.astrik.todoappapi.service;
 
 import com.astrik.todoappapi.entity.User;
 import com.astrik.todoappapi.repository.UserRepository;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Transactional
 @Service
@@ -29,31 +29,33 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public User getAuthUser() {
-        return userRepository.findByUsername(
-                (String) (SecurityContextHolder.getContext().getAuthentication().getPrincipal()));
-    }
-
     public User saveUser(User user) {
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        User userCreated = userRepository.save(user);
-        toDoService.setTodosDefault(userCreated.getId());
-        return userCreated;
+        if (userRepository.existsByUsername(user.getUsername())) {
+            return new User("this user is already registered");
+        } else {
+            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+            User userCreated = userRepository.save(user);
+            toDoService.setTodosDefault(userCreated);
+            return userCreated;
+        }
     }
 
     public User updateUser(User user) {
-        return userRepository.findById(user.getId())
-                .map(u -> {
-                    user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-                    return userRepository.save(user);
-                })
-                .orElseThrow(() -> new RuntimeException("Id not found"));
+        if (userRepository.existsByUsername(user.getUsername()))
+            return new User("this user is already registered");
+        else {
+            User userToUpdate = UserDetailsServiceImpl.getAuthUser();
+            userToUpdate.setUsername(user.getUsername());
+            userToUpdate.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+            return userRepository.save(userToUpdate);
+        }
     }
 
-    public boolean removeUser(Long id) {
-        if (userRepository.existsById(id)) {
-            userRepository.deleteById(id);
-            return true;
+    public boolean removeUser() {
+        User userToDelete = UserDetailsServiceImpl.getAuthUser();
+        if (userToDelete != null) {
+            userRepository.delete(userToDelete);
+            return !userRepository.existsById(userToDelete.getId());
         } else return false;
     }
 

@@ -1,6 +1,6 @@
 package com.astrik.todoappapi.entity;
 
-public interface UserCreate {
+public interface UserValid {
     public static final String username = "";
     public static final String password = "";
 }
