@@ -44,7 +44,7 @@ public class UserController {
             @RequestBody @Validated(UserValid.class) User user) {
         User userCreated = userService.saveUser(user);
         return userCreated.getUsername() != user.getUsername()
-                ? new ResponseEntity<>(userCreated, HttpStatus.BAD_REQUEST)
+                ? new ResponseEntity<>(userCreated, HttpStatus.SEE_OTHER)
                 : new ResponseEntity<>(userCreated, HttpStatus.CREATED);
     }
 
