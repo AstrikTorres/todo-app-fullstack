@@ -35,7 +35,6 @@ public class UserService {
         } else {
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
             User userCreated = userRepository.save(user);
-            toDoService.setTodosDefault(userCreated);
             return userCreated;
         }
     }
