@@ -15,7 +15,7 @@ import javax.validation.constraints.Min;
 import java.util.List;
 
 @RestController
-@RequestMapping("/todos")
+@RequestMapping("/api/todos")
 @Validated
 public class ToDoController {
 
