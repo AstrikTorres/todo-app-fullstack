@@ -38,7 +38,8 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 			.cors().and()
 			.csrf().disable()
 			.authorizeRequests().antMatchers(HttpMethod.POST, LOGIN_URL).permitAll().and()
-			.authorizeRequests().antMatchers(HttpMethod.POST, "/users").permitAll()
+			.authorizeRequests().antMatchers(HttpMethod.GET, "/home", "/todo-app/**").permitAll().and()
+			.authorizeRequests().antMatchers(HttpMethod.POST, "/api/users").permitAll()
 
 
 				.anyRequest().authenticated().and()
@@ -56,8 +57,8 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**").allowedOrigins("*")
-						.allowedMethods("GET", "POST", "DELETE", "PUT")
+				registry.addMapping("/**")
+						.allowedMethods("GET")
 						.exposedHeaders(HEADER_AUTHORIZATION_KEY);
 			}
 		};
