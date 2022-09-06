@@ -9,7 +9,14 @@ import org.springframework.web.servlet.ModelAndView;
 public class UIController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/home")
-    public ModelAndView index () {
+    public ModelAndView index() {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("index.html");
+        return modelAndView;
+    }
+    
+    @RequestMapping(method = RequestMethod.GET, value = "/")
+    public ModelAndView home() {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("index.html");
         return modelAndView;
