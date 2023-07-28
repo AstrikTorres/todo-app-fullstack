@@ -1,7 +1,9 @@
 # To-do App
 To Do App hecha con spring-boot y React
 
-🌐 [¡Aplicación alojada en Heroku!](https://to-do-app-astrik.herokuapp.com/)
+🌐 [¡Frontend alojado en Github pages!](https://astriktorres.github.io/todo-app/)
+
+El backend se encuentra alojado en una instancia **App Service de Azure**
 
 Este repositorio tiene el codigo del backend y del frontend!
 Carpeta del cogigo del Backend en spring 👉 ***/src***
