@@ -1,5 +1,6 @@
 # To-do App
 To Do App hecha con spring-boot y React
+
 *Experimento de integración de react con spring boot, tanto el frontend como el backend se encuentran separados en producción*
 
 🌐 [¡Frontend alojado en Github pages!](https://astriktorres.github.io/todo-app/)
